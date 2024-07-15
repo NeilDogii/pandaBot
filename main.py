@@ -4,7 +4,8 @@ import os.path
 from dotenv import load_dotenv
 from discord import Intents, Message
 from discord.ext import commands
-import urllib.request 
+import urllib.request
+from PIL import Image 
 
 # Retrieving the resource located at the URL 
 # and storing it in the file name a.png 
@@ -22,7 +23,10 @@ def getEmoji(name):
     else:
         return 0
     
-
+def resize_image(imagePath,savePath):
+    img = Image.open(imagePath)
+    img = img.resize((32,32))
+    img.save(savePath)
 
 
 
