@@ -3,7 +3,7 @@ import os
 from dotenv import load_dotenv
 from discord import Intents, Message
 from discord.ext import commands
-import customCommands
+
 
 
 #setup
@@ -15,10 +15,6 @@ intents.message_content = True
 bot = commands.Bot(command_prefix='/', intents=intents)
 
 
-
-#add commands
-for command in customCommands.commandList:
-    bot.add_command(command)
 
 
 #events
@@ -38,8 +34,8 @@ async def on_message(message: Message) -> None:
 
     print(f"User: {username} | Message: {user_message} | Channel: {channel}")
 
-    
-    await bot.process_commands(message)
+    await message.channel.send("Hi i am bot")
+    # await bot.process_commands(message)
 
 
 
