@@ -1,8 +1,28 @@
 from typing import Final
 import os
+import os.path
 from dotenv import load_dotenv
 from discord import Intents, Message
 from discord.ext import commands
+import urllib.request 
+
+# Retrieving the resource located at the URL 
+# and storing it in the file name a.png 
+
+def addEmoji(name, url):
+    if os.path.isfile("db/"+str(name)+".png"):
+        return 0
+    else:
+        urllib.request.urlretrieve(url, "db/"+str(name)+".png")
+        return 1
+    
+def getEmoji(name):
+    if os.path.isfile("db/"+str(name)+".png"):
+        return 1
+    else:
+        return 0
+    
+
 
 
 
@@ -13,8 +33,6 @@ intents: Intents = Intents.default()
 intents.message_content = True
 
 bot = commands.Bot(command_prefix='/', intents=intents)
-
-
 
 
 #events
