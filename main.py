@@ -6,6 +6,7 @@ from discord import Intents, Message
 from discord.ext import commands
 import urllib.request
 import requests
+from customcommands import setCommands
 
 
 # Retrieving the resource located at the URL 
@@ -46,6 +47,7 @@ intents: Intents = Intents.default()
 intents.message_content = True
 
 bot = commands.Bot(command_prefix='/', intents=intents)
+setCommands(bot)
 
 
 #events
@@ -65,8 +67,8 @@ async def on_message(message: Message) -> None:
 
     print(f"User: {username} | Message: {user_message} | Channel: {channel}")
 
-    await message.channel.send("Hi i am bot")
-    # await bot.process_commands(message)
+    # await message.channel.send("Hi i am bot")
+    await bot.process_commands(message)
 
 
 
