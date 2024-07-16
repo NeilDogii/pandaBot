@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 from discord import Intents, Message
 from discord.ext import commands
 import urllib.request
+import requests
 
 
 # Retrieving the resource located at the URL 
@@ -24,11 +25,22 @@ def getEmoji(name):
         return 0
     
 
+#url ta url varable e defined ache below token (saved in env file)
+#username, avatarurl, ta msg theke copy paste, ar content ta hobe emoji, content will be the image link from json file
+def sendWebhook(url, username, avatar_url, content):
+    myobj = {
+     "username": username,
+     "avatar_url": avatar_url,
+     "content": content
+    }
+    x = requests.post(url, json = myobj)
+
 
 
 
 #setup
 load_dotenv()
+url = os.getenv('WEBHOOK_URL')
 TOKEN: Final[str] = os.getenv('DISCORD_TOKEN')
 intents: Intents = Intents.default()
 intents.message_content = True
