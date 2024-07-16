@@ -21,3 +21,17 @@ def setCommands(bot):
         except:
             await ctx.send("Invalid emoji name")
     
+    @bot.command(name="addEmoji")
+    async def addEmoji(ctx):
+        try:
+            name = ctx.message.content.split(" ")[1].lower()
+            if len(ctx.message.attachments) <= 0:
+                await ctx.reply("No attachment provided")
+            else:
+                emoji = ctx.message.attachments[0].url
+                db[name] = emoji
+                json.dump(db, open(filepath,"w"))
+                await ctx.reply("Emoji added!")
+        except:
+            await ctx.send("Invalid emoji name")
+           
