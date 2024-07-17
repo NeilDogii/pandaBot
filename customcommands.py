@@ -1,7 +1,7 @@
 from discord import File
 from discord.ext import commands
 import json
-from imageresize import resize_image
+from imageresize import resize_image,resize_gif
 from requests import get
 import os
 
@@ -48,7 +48,15 @@ def setCommands(bot):
             await ctx.reply("No attachment provided")
             return 
         
-        emoji_path=downloadEmoji(ctx.message.attachments[0].url,name)
+        
+        if ctx.message.attachments[0].filename.endswith('.png'):
+            emoji_path=downloadImage(ctx.message.attachments[0].url,name)
+        elif ctx.message.attachments[0].filename.endswith('.gif'):
+            emoji_path=downloadGif(ctx.message.attachments[0].url,name)
+        else:
+            await ctx.send("Invalid format (try using .png or .gif)")
+            return
+        
         if emoji_path:
             emoji = await ctx.send(file=File(emoji_path))
             emoji = emoji.attachments[0].url
@@ -65,13 +73,24 @@ async def replyEmoji(ctx,name):
     message = await ctx.fetch_message(ctx.message.reference.message_id)
     await message.reply(db[name])
     
-def downloadEmoji(url,name):
+def downloadImage(url,name):
     temp_filepath = f"temp/{name}.png"
     response = get(url)
     if response.status_code == 200:
         with open(temp_filepath, 'wb') as f:
             f.write(response.content)
         resize_image(temp_filepath,temp_filepath)
+        return temp_filepath
+    else:
+        return None
+
+def downloadGif(url,name):
+    temp_filepath = f"temp/{name}.gif"
+    response = get(url)
+    if response.status_code == 200:
+        with open(temp_filepath, 'wb') as f:
+            f.write(response.content)
+        resize_gif(temp_filepath,temp_filepath)
         return temp_filepath
     else:
         return None
