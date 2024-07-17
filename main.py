@@ -6,6 +6,7 @@ from discord import Intents, Message
 from discord.ext import commands
 import requests
 from customcommands import setCommands
+import json
 
 
 # Retrieving the resource located at the URL 
@@ -33,6 +34,7 @@ def sendWebhook(url, username, avatar_url, content):
 
 
 
+
 #setup
 load_dotenv()
 url = os.getenv('WEBHOOK_URL')
@@ -42,6 +44,8 @@ intents.message_content = True
 
 bot = commands.Bot(command_prefix='/', intents=intents)
 setCommands(bot)
+
+
 
 
 #events

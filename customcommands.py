@@ -5,6 +5,16 @@ from imageresize import resize_image
 from requests import get
 import os
 
+
+#db setup
+temp_folder = 'temp'
+json_file = 'db.json'
+if not os.path.exists(temp_folder):
+    os.makedirs(temp_folder)
+if not os.path.exists(json_file):
+    with open(json_file, 'w') as file:
+        json.dump({},file)
+
 filepath: str = "db.json"
 db = json.load(open(filepath))
 prefix = "/"
