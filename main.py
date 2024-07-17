@@ -4,7 +4,6 @@ import os.path
 from dotenv import load_dotenv
 from discord import Intents, Message
 from discord.ext import commands
-import urllib.request
 import requests
 from customcommands import setCommands
 
@@ -12,12 +11,7 @@ from customcommands import setCommands
 # Retrieving the resource located at the URL 
 # and storing it in the file name a.png 
 
-def addEmoji(name, url):
-    if os.path.isfile("db/"+str(name)+".png"):
-        return 0
-    else:
-        urllib.request.urlretrieve(url, "db/"+str(name)+".png")
-        return 1
+
     
 def getEmoji(name):
     if os.path.isfile("db/"+str(name)+".png"):
