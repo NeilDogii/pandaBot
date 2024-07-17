@@ -49,7 +49,7 @@ def setCommands(bot):
             await ctx.send("Invalid attachment")
             return
         
-        await ctx.reply("Emoji added!")
+        await ctx.send(f"Emoji added {name}, please don't delete the bot message with image!!")
         
 async def replyEmoji(ctx,name):
     message = await ctx.fetch_message(ctx.message.reference.message_id)
