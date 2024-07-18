@@ -1,44 +1,44 @@
-from discord import File
+from discord import File,Embed
 from discord.ext import commands
 import json
 from imageresize import resize_image,resize_gif
 from requests import get
 import os
+import aiohttp
+from dotenv import load_dotenv
 
 
-#db setup
-temp_folder = 'temp'
-json_file = 'db.json'
-if not os.path.exists(temp_folder):
-    os.makedirs(temp_folder)
-if not os.path.exists(json_file):
-    with open(json_file, 'w') as file:
-        json.dump({},file)
+
 
 filepath: str = "db.json"
 db = json.load(open(filepath))
 prefix = "/"
 
+load_dotenv()
+admin = os.getenv('ADMIN_ID')
 
 def setCommands(bot):
-    @bot.command(name="emoji")
+    @bot.command(name="e")
     async def emoji(ctx):
-        try:
-            print(ctx.command)
-            name = emojiName(ctx.message.content,str(ctx.command))
-            print(name)
+        name = emojiName(ctx.message.content,str(ctx.command))
+        if name not in db:
+            await ctx.reply("Emoji not found")
+            return
+        
+        if ctx.message.reference:
+            await replyEmoji(ctx,name)
             await ctx.message.delete()
-            if ctx.message.reference:
-                replyEmoji(ctx,name)
-            else:
-                await ctx.send(db[name])
-        except:
-            await ctx.send("Invalid emoji name")
+        else:
+            avatar = await fetch_avatar(ctx.message.author.avatar)
+            await webhookSend(ctx.channel,ctx.author.nick or ctx.author.name,avatar,db[name])
+            await ctx.message.delete()
+
     
-    @bot.command(name="addEmoji")
+    @bot.command(name="ae")
     async def addEmoji(ctx):
         name = emojiName(ctx.message.content,str(ctx.command))
-        if not name or valid(name):
+        
+        if not name or invalid(name):
             await ctx.reply("Invalid name")
             return
         if name in db:
@@ -67,11 +67,56 @@ def setCommands(bot):
             await ctx.send("Invalid attachment")
             return
         
-        await ctx.send(f"Emoji added {name}, please don't delete the bot message with image!!")
+        await ctx.send(f"Emoji added {name}, please don't delete the bot message with image/gif!!")
+    
+    @bot.command(name="de")
+    async def deleteEmoji(ctx):
+        if str(ctx.message.author.id) == str(admin):
+            name = emojiName(ctx.message.content,str(ctx.command))
+            if name in db:
+                del db[name]
+                json.dump(db, open(filepath,"w"),indent=4)
+                await ctx.send(f"Emoji {name} deleted")
+            else:
+                await ctx.send("Emoji not found")
+        else:
+            await ctx.send("You are not admin")
+        
+    @bot.command(name="le")
+    async def listEmoji(ctx):
+        emojis = ""
+        for n,emoji in enumerate(db):
+            emojis += f"{n}. {emoji}\n"
+        if not emojis:
+            await ctx.send("No emojis found")
+            return
+        await ctx.send(emojis)
+        
+    @bot.command(name="helpnub")
+    async def helpNub(ctx):
+        embed = Embed(title="Help",description="Commands for the bot",color=0x00ff00)
+        embed.add_field(name="/e <name>",value="Send emoji",inline=False)
+        embed.add_field(name="/ae <name> <attachment>",value="Add emoji (.png and .gif only)",inline=False)
+        embed.add_field(name="/de <name>",value="Delete emoji (Admin only)",inline=False)
+        embed.add_field(name="/le",value="List all emojis",inline=False)
+        await ctx.send(embed=embed)    
+    
         
 async def replyEmoji(ctx,name):
     message = await ctx.fetch_message(ctx.message.reference.message_id)
     await message.reply(db[name])
+    await ctx.send(f"-# sent by {ctx.message.author.nick or ctx.message.author.name}")
+    
+async def webhookSend(channel,username,avatar,emoji):
+    webhook = await channel.create_webhook(name=username,avatar=avatar)
+    await webhook.send(emoji)
+    await webhook.delete()
+
+
+async def fetch_avatar(avatar_url):
+    async with aiohttp.ClientSession() as session:
+        async with session.get(str(avatar_url)) as response:
+            return await response.read()
     
 def downloadImage(url,name):
     temp_filepath = f"temp/{name}.png"
@@ -95,9 +140,10 @@ def downloadGif(url,name):
     else:
         return None
         
-def valid(name):
-    if " " in name or "/" in name or "\\" in name:
-        return False
+def invalid(name):
+    if " " in name or "/" in name or "\\" in name or "." in name:
+        return True
+    return False
 
 def emojiName(name,command):
     res = name[len(prefix)+len(command):].strip()

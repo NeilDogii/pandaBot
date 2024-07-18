@@ -1,43 +1,27 @@
-from typing import Final
+import json
 import os
 import os.path
+from typing import Final
 from dotenv import load_dotenv
 from discord import Intents, Message
 from discord.ext import commands
-import requests
+
+#db setup
+temp_folder = 'temp'
+json_file = 'db.json'
+if not os.path.exists(temp_folder):
+    os.makedirs(temp_folder)
+if not os.path.exists(json_file):
+    with open(json_file, 'w') as file:
+        json.dump({},file)
+
 from customcommands import setCommands
-import json
-
-
-# Retrieving the resource located at the URL 
-# and storing it in the file name a.png 
-
-
-    
-def getEmoji(name):
-    if os.path.isfile("db/"+str(name)+".png"):
-        return 1
-    else:
-        return 0
-    
-
-#url ta url varable e defined ache below token (saved in env file)
-#username, avatarurl, ta msg theke copy paste, ar content ta hobe emoji, content will be the image link from json file
-def sendWebhook(url, username, avatar_url, content):
-    myobj = {
-     "username": username,
-     "avatar_url": avatar_url,
-     "content": content
-    }
-    x = requests.post(url, json = myobj)
-
 
 
 
 
 #setup
 load_dotenv()
-url = os.getenv('WEBHOOK_URL')
 TOKEN: Final[str] = os.getenv('DISCORD_TOKEN')
 intents: Intents = Intents.default()
 intents.message_content = True
