@@ -21,6 +21,10 @@ def setCommands(bot):
     @bot.command(name="e")
     async def emoji(ctx):
         name = emojiName(ctx.message.content,str(ctx.command))
+        
+        if not name or invalid(name):
+            await ctx.reply("Invalid name")
+            return
         if name not in db:
             await ctx.reply("Emoji not found")
             return
@@ -33,6 +37,24 @@ def setCommands(bot):
             await webhookSend(ctx.channel,ctx.author.nick or ctx.author.name,avatar,db[name])
             await ctx.message.delete()
 
+    @bot.command(name="e.")
+    async def emojiSerialNumber(ctx):
+        name = emojiName(ctx.message.content,str(ctx.command))
+        if name.isdigit():
+            name=int(name)
+            if name > len(db) or name <= 0:
+                await ctx.reply("Emoji not found")
+                return
+            name = list(db.keys())[name-1]
+            if ctx.message.reference:
+                await replyEmoji(ctx,name)
+                await ctx.message.delete()
+            else:
+                avatar = await fetch_avatar(ctx.message.author.avatar)
+                await webhookSend(ctx.channel,ctx.author.nick or ctx.author.name,avatar,db[name])
+                await ctx.message.delete()
+        else:
+            await ctx.reply("Invalid serial number")
     
     @bot.command(name="ae")
     async def addEmoji(ctx):
@@ -96,6 +118,7 @@ def setCommands(bot):
     async def helpNub(ctx):
         embed = Embed(title="Help",description="Commands for the bot",color=0x00ff00)
         embed.add_field(name="/e <name>",value="Send emoji",inline=False)
+        embed.add_field(name="/e. <number>",value="Send emoji by serial number",inline=False)
         embed.add_field(name="/ae <name> <attachment>",value="Add emoji (.png and .gif only)",inline=False)
         embed.add_field(name="/de <name>",value="Delete emoji (Admin only)",inline=False)
         embed.add_field(name="/le",value="List all emojis",inline=False)

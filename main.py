@@ -43,13 +43,12 @@ async def on_message(message: Message) -> None:
     if message.author == bot.user:
         return
 
-    username: str = message.author.name
-    user_message: str = message.content
-    channel: str = message.channel.name
+    # username: str = message.author.name
+    # user_message: str = message.content
+    # channel: str = message.channel.name
 
-    print(f"User: {username} | Message: {user_message} | Channel: {channel}")
+    # print(f"User: {username} | Message: {user_message} | Channel: {channel}")
 
-    # await message.channel.send("Hi i am bot")
     await bot.process_commands(message)
 
 
