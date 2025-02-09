@@ -35,6 +35,7 @@ setCommands(bot)
 #events
 @bot.event
 async def on_ready() -> None:
+    await bot.tree.sync()
     print(f'{bot.user} has connected to Discord!')
 
 

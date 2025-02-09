@@ -1,9 +1,14 @@
-from PIL import Image,ImageSequence
+from PIL import Image, ImageSequence, ImageEnhance
 
-def resize_image(imagePath,savePath):
+def resize_image(imagePath, savePath):
     img = Image.open(imagePath)
-    img = img.resize((42,42))
-    img.save(savePath)
+    img = img.convert("RGBA") 
+    img = img.resize((42, 42), Image.Resampling.LANCZOS) 
+    
+    enhancer = ImageEnhance.Sharpness(img)
+    img = enhancer.enhance(2.0)  
+    
+    img.save(savePath, optimize=True)
     
 def resize_gif(imagePath, savePath, new_size=(42, 42)):
     img = Image.open(imagePath)

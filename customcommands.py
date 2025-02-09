@@ -33,8 +33,7 @@ def setCommands(bot):
             await replyEmoji(ctx,name)
             await ctx.message.delete()
         else:
-            avatar = await fetch_avatar(ctx.message.author.avatar)
-            await webhookSend(ctx.channel,ctx.author.nick or ctx.author.name,avatar,db[name])
+            await sendEmoji(ctx,name)
             await ctx.message.delete()
 
     @bot.command(name="e.")
@@ -50,8 +49,7 @@ def setCommands(bot):
                 await replyEmoji(ctx,name)
                 await ctx.message.delete()
             else:
-                avatar = await fetch_avatar(ctx.message.author.avatar)
-                await webhookSend(ctx.channel,ctx.author.nick or ctx.author.name,avatar,db[name])
+                await sendEmoji(ctx,name)
                 await ctx.message.delete()
         else:
             await ctx.reply("Invalid serial number")
@@ -130,16 +128,10 @@ async def replyEmoji(ctx,name):
     await message.reply(db[name])
     await ctx.send(f"-# sent by {ctx.message.author.nick or ctx.message.author.name}")
     
-async def webhookSend(channel,username,avatar,emoji):
-    webhook = await channel.create_webhook(name=username,avatar=avatar)
-    await webhook.send(emoji)
-    await webhook.delete()
+async def sendEmoji(ctx,name):
+    await ctx.send(db[name])
+    await ctx.send(f"-# sent by {ctx.message.author.nick or ctx.message.author.name}")
 
-
-async def fetch_avatar(avatar_url):
-    async with aiohttp.ClientSession() as session:
-        async with session.get(str(avatar_url)) as response:
-            return await response.read()
     
 def downloadImage(url,name):
     temp_filepath = f"temp/{name}.png"
